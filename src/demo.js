@@ -5,48 +5,57 @@ import {
   BarSeries,
   Title,
   ArgumentAxis,
-  ValueAxis
+  ValueAxis,
+  
 } from "@devexpress/dx-react-chart-material-ui";
 import { Animation } from "@devexpress/dx-react-chart";
 import { dummydata } from "./constant";
-let finalData = new Array();
-let tickerData = dummydata.records.reduce((group, ticket) => {
+let finalData = [];
+let tickerData = dummydata.records.reduce((categories, ticket) => {
   const assignee = ticket.assignee;
+ 
+if(assignee in categories){
+  categories[assignee]++
+  finalData.filter(x=>x.name===assignee)[0].count=categories[assignee]
 
-  group[assignee] = group[assignee] ?? [];
-  group[assignee].push(ticket);
-  return group;
+  
+}else
+{
+  categories[assignee]=1
+  // if(finalData.filter(x=>x.name===assignee).length>0){
+  // finalData.filter(x=>x.name===assignee)[0].count=categories[assignee]
+
+  // }else{
+  finalData.push({name:assignee,count:categories[assignee]})
+  //}
+
+  
+}
+  return categories;
 }, {});
+console.log("tickerData", tickerData);
+console.log("finalData", finalData);
 
-Object.keys(tickerData).forEach((item) => {
-  finalData.push({ name: item, count: tickerData[item].length });
-});
-console.log("tickerData", finalData);
-const data = [{ year: 1234, population: 5.8 }];
 
 export default class Demo extends React.PureComponent {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      data
-    };
-  }
 
   render() {
-    const { data: chartData } = this.state;
 
     return (
-      <Paper>
-        <Chart data={chartData}>
-          <ArgumentAxis />
-          <ValueAxis max={7} />
+      
+       <Paper>
+        <Chart data={finalData}>
+          <ArgumentAxis showLabels='false' >
+          
+           </ArgumentAxis>
+          <ValueAxis  />
 
-          <BarSeries valueField="population" argumentField="year" />
+          <BarSeries valueField="count" argumentField="name" />
           <Title text="Ticket Data" />
           <Animation />
         </Chart>
       </Paper>
+      
     );
   }
 }
